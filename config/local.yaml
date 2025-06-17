@@ -1,0 +1,6 @@
+env: "Local"
+storage_path: "url-shoter/storage/storage.db"
+http-server: 
+  address: "Localhost:8080"
+  timeout: 4s
+  idle_timeout: 60s
