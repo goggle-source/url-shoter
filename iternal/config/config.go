@@ -11,14 +11,13 @@ import (
 type Config struct {
 	Env         string `yaml:"env" env:"ENV" env-default:"product"`
 	StoragePath string `yaml:"storage_path" env-requirend:"true"`
-	HTTPServer `yaml:"http-server"`
+	HTTPServer  `yaml:"http-server"`
 }
 
 type HTTPServer struct {
-	Address string `yaml:"address" env-default:"Localhost:8080"`
-	Timeout time.Duration `yaml:"timeout" env-default:"10s"`
+	Address     string        `yaml:"address" env-default:"Localhost:8080"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"10s"`
 	IdleTimeout time.Duration `yaml:"idle-timeout" env-default:"60s"`
-
 }
 
 func MustLoad() *Config {
@@ -37,5 +36,5 @@ func MustLoad() *Config {
 		log.Fatalf("cannot read config: %s", err)
 	}
 
-	return  &cfg
+	return &cfg
 }
