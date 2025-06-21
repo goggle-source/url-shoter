@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/url-shoter/iternal/config"
 	"github.com/url-shoter/iternal/lib/logger/slo"
 	"github.com/url-shoter/iternal/storage/sqlite"
@@ -28,8 +30,10 @@ func main() {
 	}
 
 	_ = storage
+	router := chi.NewRouter()
 
-	//TODO: init router: chi, chi renger
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
 
 	//TODO: run server
 }
@@ -51,7 +55,8 @@ func setupLogger(env string) *slog.Logger {
 		log = slog.New(
 			slog.NewJSONHandler(
 				os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
-	default :
+
+	default:
 		log = slog.New(
 			slog.NewJSONHandler(
 				os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
