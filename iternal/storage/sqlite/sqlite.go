@@ -14,7 +14,7 @@ type Storage struct {
 func New(dbPath string) (*Storage, error) {
 	const op = "storage.sqlite.New"
 
-	db, err := sql.Open("sqlit3", "./url-shoter.db")
+	db, err := sql.Open("sqlite3", "./url-shoter.db")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %v", op, err)
 	}
@@ -26,12 +26,12 @@ func New(dbPath string) (*Storage, error) {
 	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("{op} : {err}")
+		return nil, fmt.Errorf("%s : %w", op, err)
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
-		return nil, fmt.Errorf("{op} : {err}")
+		return nil, fmt.Errorf("%s : %w", op, err)
 	}
 	return &Storage{db: db}, nil
 }
