@@ -58,8 +58,6 @@ func main() {
 	}
 
 	log.Error("server stoped")
-
-	//TODO: run server
 }
 
 func setupLogger(env string) *slog.Logger {
