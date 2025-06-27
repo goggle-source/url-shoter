@@ -56,6 +56,8 @@ func TestSaveHandler(t *testing.T) {
 	}
 
 	for _, tc := range cases {
+		tc := tc
+
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -63,7 +65,8 @@ func TestSaveHandler(t *testing.T) {
 
 			if tc.respError == "" || tc.mockError != nil {
 				urlSaverMock.On("SaveURL", tc.url, mock.AnythingOfType("string")).
-				Return(int64(1), tc.mockError).Once()
+					Return(int64(1), tc.mockError).
+					Once()
 			}
 
 			handler := save.New(slogdiscard.NewDiscardLogger(), urlSaverMock)
@@ -74,7 +77,7 @@ func TestSaveHandler(t *testing.T) {
 			require.NoError(t, err)
 
 			rr := httptest.NewRecorder()
-			handler.ServeHTTP(rr,req)
+			handler.ServeHTTP(rr, req)
 
 			require.Equal(t, rr.Code, http.StatusOK)
 

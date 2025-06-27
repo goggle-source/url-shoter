@@ -2,6 +2,7 @@ package save
 
 import (
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 
@@ -42,10 +43,17 @@ func New(log *slog.Logger, urlSave URLSaver) http.HandlerFunc {
 		var req Request
 
 		err := render.DecodeJSON(r.Body, &req)
-		if err != nil {
-			log.Error("failed to decode requrest body", slo.Err(err))
+		if errors.Is(err, io.EOF) {
+			log.Error("requests body is empty")
 
-			render.JSON(w, r, response.Error("failed to decode request"))
+			render.JSON(w, r, response.Error("empty requests"))
+
+			return
+		}
+		if err != nil {
+			log.Error("failed to decode request body", slo.Err(err))
+
+			render.JSON(w, r, response.Error("failed to decode requests"))
 
 			return
 		}
@@ -57,13 +65,13 @@ func New(log *slog.Logger, urlSave URLSaver) http.HandlerFunc {
 
 			log.Error("invalid request", slo.Err(err))
 
-			render.JSON(w, r, response.Error("invalid request"))
 			render.JSON(w, r, response.ValidatorError(validateErr))
 
 			return
 		}
 
 		alias := req.Alias
+
 		if alias == "" {
 			alias = random.NewRandomString(aliasLength)
 		}
@@ -77,13 +85,23 @@ func New(log *slog.Logger, urlSave URLSaver) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			log.Error("field to add url")
+			log.Error("failed to add url", slo.Err(err))
 
-			render.JSON(w, r, response.Error("field to add url"))
+			render.JSON(w, r, response.Error("failed to add url"))
 
 			return
 		}
 
 		log.Info("url added", slog.Int64("id", id))
+
+		ResponseOk(w, r, alias)
+
 	}
+}
+
+func ResponseOk(w http.ResponseWriter, r *http.Request, alias string) {
+	render.JSON(w, r, Response{
+		Response: response.OK(),
+		Alias:    alias,
+	})
 }

@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-func NewRandomString(aliasLength int) string {
+func NewRandomString(size int) string {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	arr := []rune("qwertyuiopasdfghjklzxcvbnm" + "QWERTYUIOPASDFGHJKLZXCVBNM" + "1234567890" + "*#$")
 
-	result := make([]rune, aliasLength)
+	result := make([]rune, size)
 
-	for i := 0; i < aliasLength; i++ {
+	for i := range result {
 		result[i] = arr[rnd.Intn(len(arr))]
 	}
 

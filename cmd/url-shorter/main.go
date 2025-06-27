@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/url-shoter/iternal/config"
+	"github.com/url-shoter/iternal/http-server/handlers/delete"
+	"github.com/url-shoter/iternal/http-server/handlers/redirect"
 	"github.com/url-shoter/iternal/http-server/handlers/url/save"
 	mwLogger "github.com/url-shoter/iternal/http-server/mwLogger/logger"
 	"github.com/url-shoter/iternal/lib/logger/slo"
@@ -41,7 +43,16 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/url", save.New(log, storage))
+	router.Route("/url", func(r chi.Router) {
+		r.Use(middleware.BasicAuth("url-shortner", map[string]string{
+			cfg.HTTPServer.User: cfg.HTTPServer.Password,
+		}))
+
+		r.Post("/url", save.New(log, storage))
+		r.Delete("/{alias}", delete.New(log, storage))
+	})
+
+	router.Get("/{alias}", redirect.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 
